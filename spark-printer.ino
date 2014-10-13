@@ -38,6 +38,25 @@ int printBold(String args){
   return 1;
 }
 
+int print(String args){
+  // String = "BOLD='Hello'/"
+  
+  int positionEqualsign = 0;
+  int positionSlash = 0;
+  
+  positionEqualsign = args.indexOf("=");
+  positionSlash = args.lastIndexOf("/");
+  String command = args.substring(0,positionEqualsign);
+  String bodyText = args.substring(positionEqualsign,positionSlash);
+  
+  if(command == "BOLD")
+    printBold(bodyText);
+  else if(command == "TEXT")
+    printLine(bodyText);
+  else
+    return -1;
+}
+
 void setup(){
   Serial1.begin(19200);
   printer.begin(&Serial1);
