@@ -22,7 +22,7 @@
 Adafruit_Thermal printer;
 
 // This command prints a single line, and can called from the Spark API
-int printLine(String args){
+int printALine(String args){
    printer.wake();
    printer.println(args);
    printer.sleep();
@@ -49,20 +49,24 @@ int print(String args){
   String command = args.substring(0,positionEqualsign);
   String bodyText = args.substring(positionEqualsign,positionSlash);
   
-  if(command == "BOLD")
+  if(command == "BOLD") {
     printBold(bodyText);
-  else if(command == "TEXT")
-    printLine(bodyText);
-  else
+    return 2;
+  }
+  else if(command == "TEXT") {
+    printALine(bodyText);
+    return 1;
+  }
+  else {
     return -1;
+  }
 }
 
 void setup(){
   Serial1.begin(19200);
   printer.begin(&Serial1);
   
-  Spark.function("printLine", printLine);
-  Spark.function("printBold", printBold);
+  Spark.function("print", print);
 
   // The following function calls are in setup(), but do not need to be.
   // Use them anywhere!  They're just here so they're run only one time
