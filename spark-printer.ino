@@ -116,18 +116,15 @@ void setup(){
   Spark.function("print", print);
 //   Spark.function("printImage", printImage);
 
-  printer.println("Team Spark rulez!");
-  printer.feed(1);
-  printer.boldOn();
+//   printer.println("Team Spark rulez!");
+  printer.feed(1);  
+  printer.justify('C'); // centre justify
   printer.println("Spark Printer is online.");
-  printer.boldOff();
   printer.feed(1);
-  printer.println("---------------");
-  printer.feed(1);
-  printer.feed(1);
-  printer.feed(1);
-  printer.feed(1);
-
+  printer.println("~");
+  printer.justify('L'); // centre justify
+  printer.feed(5);
+  
   printer.sleep();      // Tell printer to sleep
   printer.wake();       // MUST call wake() before printing again, even if reset
   printer.setDefault(); // Restore printer to defaults
@@ -135,47 +132,50 @@ void setup(){
 
 void loop()
 {
-//   /* Temporary loop counter */
-//   uint8_t i;
+  /* Temporary loop counter */
+  uint8_t i;
 
-//   /* Has a card been detected? */
-//   if (RC522.isCard())
-//   {
-//     /* If so then get its serial number */
-//     RC522.readCardSerial();
-//     // tone(A2, 1174.66, 500);
-//     Serial.println("Card detected:");
-    
-//     /* Output the serial number to the UART */
-//     for(i = 0; i <= 4; i++)
-//     {
-//       Serial.print(RC522.serNum[i],HEX);
-//       scannedCardID + (RC522.serNum[i]);
-//     }
-//     Serial.println();
-    
-//     Spark.publish("scannedCardID",scannedCardID);
-//     scannedCardID == "";
-//   }
-//   else
-//   {
-//       Serial.println("Card NOT detected:");
-//       scannedCardID == "no card";
-//       Spark.publish("scannedCardID",scannedCardID);
-//       scannedCardID == "";
-//   }   
-//   delay(500);
-
-    unsigned long now = millis();
-    //Every 15 seconds publish uptime
-    if (now-lastTime>15000UL) {
-        lastTime = now;
-        // now is in milliseconds
-        unsigned nowSec = now/1000UL;
-        unsigned sec = nowSec%60;
-        unsigned min = (nowSec%3600)/60;
-        unsigned hours = (nowSec%86400)/3600;
-        sprintf(publishString,"%u:%u:%u",hours,min,sec);
-        Spark.publish("Uptime",publishString);
+  unsigned long now = millis();
+  //Every 15 seconds publish uptime
+  if (now-lastTime>1000UL) {
+      lastTime = now;
+      scannedCardID == "";
+      
+      /* Has a card been detected? */
+      if (RC522.isCard())
+        {
+        /* If so then get its serial number */
+        RC522.readCardSerial();
+        // tone(A2, 1174.66, 500);
+        Serial.println("Card detected:");
+      
+        /* Output the serial number to the UART */
+        for(i = 0; i <= 4; i++)
+        {
+          Serial.print(RC522.serNum[i],HEX);
+          scannedCardID + (RC522.serNum[i]);
+        }
+        Serial.println();
+      
+        Spark.publish("scannedCardID",scannedCardID);
+      }
+      else
+      {
+        Serial.println("Card NOT detected:");
+        scannedCardID == "no card";
+        Spark.publish("scannedCardID",scannedCardID);
+      }   
     }
+  // unsigned long now = millis();
+  // //Every 15 seconds publish uptime
+  // if (now-lastTime>10000UL) {
+  //     lastTime = now;
+  //     // now is in milliseconds
+  //     unsigned nowSec = now/1000UL;
+  //     unsigned sec = nowSec%60;
+  //     unsigned min = (nowSec%3600)/60;
+  //     unsigned hours = (nowSec%86400)/3600;
+  //     sprintf(publishString,"%u:%u:%u",hours,min,sec);
+  //     Spark.publish("Uptime",publishString);
+  // }
 }
