@@ -15,38 +15,38 @@
 /******************************************************************************
  * Definitions
  ******************************************************************************/
-#define MAX_LEN 16   // Largo mÃ¡ximo de la matriz
+#define MAX_LEN 16   // Maximum array length
 
-//MF522 comando palabra
-#define PCD_IDLE              0x00               // NO action; Y cancelar el comando
-#define PCD_AUTHENT           0x0E               // autenticaciÃ³n de clave
-#define PCD_RECEIVE           0x08               // recepciÃ³n de datos
-#define PCD_TRANSMIT          0x04               // Enviar datos
-#define PCD_TRANSCEIVE        0x0C               // Enviar y recibir datos
-#define PCD_RESETPHASE        0x0F               // reajustar
-#define PCD_CALCCRC           0x03               // CRC calcular
+//MF522 command codes
+#define PCD_IDLE              0x00               // no action and cancel the command
+#define PCD_AUTHENT           0x0E               // authentication key
+#define PCD_RECEIVE           0x08               // receive data
+#define PCD_TRANSMIT          0x04               // send data
+#define PCD_TRANSCEIVE        0x0C               // send and receive data
+#define PCD_RESETPHASE        0x0F               // reset
+#define PCD_CALCCRC           0x03               // calculate CRC
 
-//Mifare_One  Tarjeta Mifare_One comando palabra
-#define PICC_REQIDL           0x26               // Ãrea de la antena no estÃ¡ tratando de entrar en el estado de reposo
-#define PICC_REQALL           0x52               // Todas las cartas para encontrar el Ã¡rea de la antena
-#define PICC_ANTICOLL         0x93               // anti-colisiÃ³n
-#define PICC_SElECTTAG        0x93               // elecciÃ³n de tarjeta
-#define PICC_AUTHENT1A        0x60               // verificaciÃ³n key A
-#define PICC_AUTHENT1B        0x61               // verificaciÃ³n Key B
-#define PICC_READ             0x30               // leer bloque
-#define PICC_WRITE            0xA0               // Escribir en el bloque 
-#define PICC_DECREMENT        0xC0               // cargo
-#define PICC_INCREMENT        0xC1               // recargar
-#define PICC_RESTORE          0xC2               // Transferencia de datos de bloque de buffer
-#define PICC_TRANSFER         0xB0               // Guardar los datos en el bÃºfer
-#define PICC_HALT             0x50               // inactividad
+//Mifare One command codes
+#define PICC_REQIDL           0x26               // look for idle cards within range of antenna (?)
+#define PICC_REQALL           0x52               // find all cards within range of the antenna
+#define PICC_ANTICOLL         0x93               // anti-collision
+#define PICC_SElECTTAG        0x93               // choose card
+#define PICC_AUTHENT1A        0x60               // verification key A
+#define PICC_AUTHENT1B        0x61               // verification Key B
+#define PICC_READ             0x30               // read block
+#define PICC_WRITE            0xA0               // write to block
+#define PICC_DECREMENT        0xC0               // charge
+#define PICC_INCREMENT        0xC1               // reload
+#define PICC_RESTORE          0xC2               // transfer block data buffer
+#define PICC_TRANSFER         0xB0               // save data in buffer
+#define PICC_HALT             0x50               // inactivity
 
-//MF522 CÃ³digo de error de comunicaciÃ³n cuando regresÃ³
+//MF522 communication error code on return
 #define MI_OK                 0
 #define MI_NOTAGERR           1
 #define MI_ERR                2
 
-//------------------ MFRC522 registro---------------
+//------------------ MFRC522 registration---------------
 //Page 0:Command and Status
 #define     Reserved00            0x00    
 #define     CommandReg            0x01    
@@ -90,7 +90,7 @@
 #define     Reserved22            0x25
 #define     RFCfgReg              0x26
 #define     GsNReg                0x27
-#define     CWGsPReg	          0x28
+#define     CWGsPReg            0x28
 #define     ModGsPReg             0x29
 #define     TModeReg              0x2A
 #define     TPrescalerReg         0x2B
@@ -114,7 +114,7 @@
 #define     Reserved31            0x3C   
 #define     Reserved32            0x3D   
 #define     Reserved33            0x3E   
-#define     Reserved34			  0x3F
+#define     Reserved34        0x3F
 //-----------------------------------------------
 
 class RFID
@@ -124,33 +124,33 @@ class RFID
     
     RFID(uint8_t chipSelectPin, uint8_t NRSTPD, uint8_t mosiPin, uint8_t misoPin, uint8_t clockPin);
 
-	bool isCard();
-	bool readCardSerial();
+  bool isCard();
+  bool readCardSerial();
 
     void init();
-	void reset();
-	void writeMFRC522(uint8_t addr, uint8_t val);
-	void antennaOn(void);
-	uint8_t readMFRC522(uint8_t addr);
-	void setBitMask(uint8_t reg, uint8_t mask);
-	void clearBitMask(uint8_t reg, uint8_t mask);
-	void calculateCRC(uint8_t *pIndata, uint8_t len, uint8_t *pOutData);
-	uint8_t MFRC522Request(uint8_t reqMode, uint8_t *TagType);
-	uint8_t MFRC522ToCard(uint8_t command, uint8_t *sendData, uint8_t sendLen, uint8_t *backData, uint16_t *backLen);
-	uint8_t anticoll(uint8_t *serNum);
-	uint8_t auth(uint8_t authMode, uint8_t BlockAddr, uint8_t *Sectorkey, uint8_t *serNum);
-	uint8_t read(uint8_t blockAddr, uint8_t *recvData);
-	uint8_t write(uint8_t blockAddr, uint8_t *writeData);
-	void halt();
+  void reset();
+  void writeMFRC522(uint8_t addr, uint8_t val);
+  void antennaOn(void);
+  uint8_t readMFRC522(uint8_t addr);
+  void setBitMask(uint8_t reg, uint8_t mask);
+  void clearBitMask(uint8_t reg, uint8_t mask);
+  void calculateCRC(uint8_t *pIndata, uint8_t len, uint8_t *pOutData);
+  uint8_t MFRC522Request(uint8_t reqMode, uint8_t *TagType);
+  uint8_t MFRC522ToCard(uint8_t command, uint8_t *sendData, uint8_t sendLen, uint8_t *backData, uint16_t *backLen);
+  uint8_t anticoll(uint8_t *serNum);
+  uint8_t auth(uint8_t authMode, uint8_t BlockAddr, uint8_t *Sectorkey, uint8_t *serNum);
+  uint8_t read(uint8_t blockAddr, uint8_t *recvData);
+  uint8_t write(uint8_t blockAddr, uint8_t *writeData);
+  void halt();
 
-	uint8_t serNum[5];       // Constante para guardar el numero de serie leido.
-	uint8_t AserNum[5];      // Constante para guardar el numero d serie de la secion actual.
+  uint8_t serNum[5];       // Constante para guardar el numero de serie leido.
+  uint8_t AserNum[5];      // Constante para guardar el numero d serie de la secion actual.
 
   private:
     uint8_t softSPITranser(uint8_t data);      // SOFT SPI
   
     uint8_t _chipSelectPin;
-	uint8_t _NRSTPD;
+  uint8_t _NRSTPD;
     uint8_t _mosiPin;
     uint8_t _misoPin;
     uint8_t _clockPin;
