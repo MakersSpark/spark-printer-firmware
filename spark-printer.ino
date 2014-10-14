@@ -1,22 +1,20 @@
+#include "adaqrcode.h"
+
 // enables second UART serial on pin D1(TX) and D0(RX)
 // #include "Serial2/Serial2.h"
 
 /* Include the RFID library */
-/* SEE RFID.h for selecting Hardware or Software SPI modes */
 #include "RFID.h"
 
 /* Define the pins used for the SS (SDA) and RST (reset) pins for BOTH hardware and software SPI */
-/* Change as required */
 #define SS_PIN      A2      // Same pin used as hardware SPI (SS)
 #define RST_PIN     D2
 
 /* Define the pins used for the DATA OUT (MOSI), DATA IN (MISO) and CLOCK (SCK) pins for SOFTWARE SPI ONLY */
-/* Change as required and may be same as hardware SPI as listed in comments */
 #define MOSI_PIN    A5      // hardware SPI: A5
 #define MISO_PIN    A4      //     "     " : A4
 #define SCK_PIN     A3      //     "     " : A3
 
-// This #include statement was automatically added by the Spark IDE.
 #include "Adafruit_Thermal.h"
 
 /* Create an instance of the RFID library */
@@ -49,7 +47,7 @@ int print(String args){
   
   if(command == "BOLD") {
     printBold(bodyText);
-    return 2;
+    return 1;
   }
   else if(command == "TEXT") {
     printALine(bodyText);
@@ -60,7 +58,7 @@ int print(String args){
     // printer.wake();
     // printer.feed(2);
     // printer.sleep();
-    return 3;
+    return 1;
   }
   else {
     return -1;
@@ -119,15 +117,20 @@ void setup(){
 //   printer.println("Team Spark rulez!");
   printer.feed(1);  
   printer.justify('C'); // centre justify
-  printer.println("Spark Printer is online.");
+  printer.println("Welcome to Spark Printer.");
   printer.feed(1);
   printer.println("~");
-  printer.justify('L'); // centre justify
+  printer.feed(2);
+  
+  printer.printBitmap(adaqrcode_width, adaqrcode_height, adaqrcode_data);
   printer.feed(5);
   
-  printer.sleep();      // Tell printer to sleep
-  printer.wake();       // MUST call wake() before printing again, even if reset
+  printer.justify('L'); // left justify
   printer.setDefault(); // Restore printer to defaults
+  
+  printer.sleep();      // Tell printer to sleep
+//   printer.wake();       // MUST call wake() before printing again, even if reset
+  
 }
 
 void loop()
