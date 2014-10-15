@@ -28,8 +28,8 @@ int printer_RX_Pin = 0;  // Serial1 Rx pin on Spark to the green wire on printer
 int printer_TX_Pin = 0;  // Serial1 Tx pin on Spark to the yellow wire on printer
 
 unsigned long lastTime = 0UL;
-char publishString[40];
-char scannedCardID[10];
+
+
 
 Adafruit_Thermal printer(printer_RX_Pin, printer_TX_Pin);
 
@@ -53,11 +53,11 @@ int print(String args){
     printALine(bodyText);
     return 1;
   }
-  else if(command == "HELO") {
+  else if(command == "HELLO") {
     printALine(bodyText);
-    // printer.wake();
-    // printer.feed(2);
-    // printer.sleep();
+    printer.wake();
+    printer.feed(2);
+    printer.sleep();
     return 1;
   }
   else {
@@ -75,7 +75,6 @@ int printImage(String args){
 int printALine(String args){
    printer.wake();
    printer.println(args);
-   printer.feed(2);
    printer.sleep();
    return 1;
 }
@@ -85,7 +84,6 @@ int printBold(String args){
   printer.boldOn();
   printer.println(args);
   printer.boldOff();
-  printer.feed(2);
   printer.sleep();
   return 1;
 }
@@ -122,8 +120,8 @@ void setup(){
   printer.println("~");
   printer.feed(2);
   
-  printer.printBitmap(adaqrcode_width, adaqrcode_height, adaqrcode_data);
-  printer.feed(5);
+//   printer.printBitmap(adaqrcode_width, adaqrcode_height, adaqrcode_data);
+//   printer.feed(5);
   
   printer.justify('L'); // left justify
   printer.setDefault(); // Restore printer to defaults
@@ -137,13 +135,18 @@ void loop()
 {
   /* Temporary loop counter */
   uint8_t i;
+  
+  String scannedCardID = "none";
+  String cardHex0 = "none";
+  String cardHex1 = "none";
+  String cardHex2 = "none";
+  String cardHex3 = "none";
 
   unsigned long now = millis();
   //Every 15 seconds publish uptime
   if (now-lastTime>1000UL) {
       lastTime = now;
-      scannedCardID == "";
-      
+    
       /* Has a card been detected? */
       if (RC522.isCard())
         {
@@ -153,32 +156,35 @@ void loop()
         Serial.println("Card detected:");
       
         /* Output the serial number to the UART */
-        for(i = 0; i <= 4; i++)
-        {
-          Serial.print(RC522.serNum[i],HEX);
-          scannedCardID + (RC522.serNum[i]);
-        }
+        
+        //   Serial.print(RC522.serNum[0],HEX);
+        //   Serial.print(RC522.serNum[1],HEX);
+        //   Serial.print(RC522.serNum[2],HEX);
+        //   Serial.print(RC522.serNum[3],HEX);
+          
+          String cardHex0 = String(RC522.serNum[0],HEX);
+          String cardHex1 = String(RC522.serNum[1],HEX);
+          String cardHex2 = String(RC522.serNum[2],HEX);
+          String cardHex3 = String(RC522.serNum[3],HEX);
+          
+          String scannedCardID = cardHex0 + cardHex1 + cardHex2 + cardHex3;
+          
+        //   String scannedCardID = "hello";
+        //   String cardHex0 = String(RC522.serNum[i],HEX);
+        //   Serial.println(cardHex[i]);
+        //   String cardhex[i] = String(RC522.serNum[i],HEX);
+        
         Serial.println();
-      
+        Serial.println("and the card ID is...");
+        Serial.println(scannedCardID);
+        // Serial.println(scannedCardID);
         Spark.publish("scannedCardID",scannedCardID);
       }
       else
       {
         Serial.println("Card NOT detected:");
-        scannedCardID == "no card";
-        Spark.publish("scannedCardID",scannedCardID);
+        // scannedCardID = "no card";
+        // Spark.publish("scannedCardID",scannedCardID);
       }   
     }
-  // unsigned long now = millis();
-  // //Every 15 seconds publish uptime
-  // if (now-lastTime>10000UL) {
-  //     lastTime = now;
-  //     // now is in milliseconds
-  //     unsigned nowSec = now/1000UL;
-  //     unsigned sec = nowSec%60;
-  //     unsigned min = (nowSec%3600)/60;
-  //     unsigned hours = (nowSec%86400)/3600;
-  //     sprintf(publishString,"%u:%u:%u",hours,min,sec);
-  //     Spark.publish("Uptime",publishString);
-  // }
 }
