@@ -91,6 +91,8 @@ int printBold(String args){
 
 void setup(){
     
+    Spark.publish(printerOnline);
+    
   //
 //   RFID SETUP
    Serial.begin(9600);
@@ -116,9 +118,18 @@ void setup(){
   printer.feed(1);  
   printer.justify('C'); // centre justify
   printer.println("Welcome to Spark Printer.");
+//   printer.feed(2);
+//   printer.println("CURRENT NETWORK");
+//   printer.println(WiFi.SSID());
+//   printer.feed(1);
+//   printer.println("WI-FI SIGNAL STRENGTH");
+//   printer.println(WiFi.RSSI());
+//   printer.feed(1);
+//   printer.println("LOCAL IP ADDRESS");
+//   printer.println(WiFi.localIP());
   printer.feed(1);
   printer.println("~");
-  printer.feed(2);
+  printer.feed(5);
   
 //   printer.printBitmap(adaqrcode_width, adaqrcode_height, adaqrcode_data);
 //   printer.feed(5);
@@ -177,8 +188,14 @@ void loop()
         Serial.println();
         Serial.println("and the card ID is...");
         Serial.println(scannedCardID);
-        // Serial.println(scannedCardID);
+        
+        // prints the card ID to the printer for testing purposes
         Spark.publish("scannedCardID",scannedCardID);
+        printer.wake();
+        printer.println("Card detected:");
+        printer.println(scannedCardID);
+        printer.feed(2);
+        printer.sleep();
       }
       else
       {
