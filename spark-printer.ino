@@ -53,6 +53,18 @@ int print(String args){
     printALine(bodyText);
     return 1;
   }
+  else if(command == "BIG") {
+    printBig(bodyText);
+    return 1;
+  }
+  else if(command == "CENTRE") {
+    printCentre(bodyText);
+    return 1;
+  }
+   else if(command == "CENTREBIG") {
+    printCentreBig(bodyText);
+    return 1;
+  }
   else if(command == "HELLO") {
     printALine(bodyText);
     printer.wake();
@@ -79,6 +91,24 @@ int printALine(String args){
    return 1;
 }
 
+int printBig(String args){
+  printer.wake();
+  printer.setSize('L');
+  printer.println(args);
+  printer.setSize('S');
+  printer.sleep();
+  return 1;
+}
+
+int printCentre(String args){
+  printer.wake();
+  printer.justify('C');
+  printer.println(args);
+  printer.justify('L');
+  printer.sleep();
+  return 1;
+}
+
 int printBold(String args){
   printer.wake();
   printer.boldOn();
@@ -88,10 +118,19 @@ int printBold(String args){
   return 1;
 }
 
+int printCentreBig(String args){
+  printer.wake();
+  printer.setSize('L');
+  printer.justify('C');
+  printer.println(args);
+  printer.setSize('S');
+  printer.justify('L');
+  printer.sleep();
+  return 1;
+}
+
 
 void setup(){
-    
-    Spark.publish(printerOnline);
     
   //
 //   RFID SETUP
