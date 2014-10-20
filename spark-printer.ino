@@ -228,11 +228,11 @@ void loop()
         // prints the card ID to the printer for testing purposes
         Spark.publish("scannedCardID",scannedCardID);
         digitalWrite(led, HIGH);
-        delay(150);
+        delay(100);
         digitalWrite(led, LOW);
         delay(50);
         digitalWrite(led, HIGH);
-        delay(150);
+        delay(100);
         digitalWrite(led, LOW);
         // printer.wake();
         // printer.println("Card detected:");
@@ -243,6 +243,9 @@ void loop()
       else
       {
         Serial.println("Card NOT detected:");
+        digitalWrite(led, HIGH);
+        delay(50);
+        digitalWrite(led, LOW);
         // scannedCardID = "no card";
         // Spark.publish("scannedCardID",scannedCardID);
       }   
