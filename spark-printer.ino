@@ -1,8 +1,3 @@
-#include "adaqrcode.h"
-
-// enables second UART serial on pin D1(TX) and D0(RX)
-// #include "Serial2/Serial2.h"
-
 /* Include the RFID library */
 #include "RFID.h"
 
@@ -29,13 +24,10 @@ int printer_TX_Pin = 0;  // Serial1 Tx pin on Spark to the yellow wire on printe
 
 unsigned long lastTime = 0UL;
 
-
-
 Adafruit_Thermal printer(printer_RX_Pin, printer_TX_Pin);
 
 // master print command
 int print(String args){
-  // String = "BOLD='Hello'/"
   
   int positionEqualsign = 0;
   int positionSlash = 0;
@@ -78,12 +70,10 @@ int print(String args){
 }
 
 
-
 int printImage(String args){
   return 1;
 }
 
-// This command prints a single line, and can called from the Spark API
 int printALine(String args){
    printer.wake();
    printer.println(args);
@@ -129,10 +119,6 @@ int printCentreBig(String args){
   return 1;
 }
 
-
-
-
-
 //
 //
 // program main body
@@ -141,53 +127,33 @@ int printCentreBig(String args){
 
 void setup(){
     
-  //
-//   RFID SETUP
-   Serial.begin(9600);
+  // open serial over USB for debugging
+  Serial.begin(9600);
   
-  /* Enable the SPI interface */
+  // Enable the SPI interface
   SPI.setDataMode(SPI_MODE0);
   SPI.setBitOrder(MSBFIRST);
   SPI.setClockDivider(SPI_CLOCK_DIV8);
   SPI.begin();
   
-  /* Initialise the RFID reader */
+  // Initialise the RFID reader
   RC522.init();
 
-//   Serial.begin(9600);
-  
+  // Initialise the printer
   Serial1.begin(19200);
   printer.begin();
   
   Spark.function("print", print);
-//   Spark.function("printImage", printImage);
 
-//   printer.println("Team Spark rulez!");
   printer.feed(3);  
   printer.justify('C'); // centre justify
   printer.println("Welcome to Spark Printer.");
-//   printer.feed(2);
-//   printer.println("CURRENT NETWORK");
-//   printer.println(WiFi.SSID());
-//   printer.feed(1);
-//   printer.println("WI-FI SIGNAL STRENGTH");
-//   printer.println(WiFi.RSSI());
-//   printer.feed(1);
-//   printer.println("LOCAL IP ADDRESS");
-//   printer.println(WiFi.localIP());
   printer.feed(1);
   printer.println("~");
   printer.feed(5);
-  
-//   printer.printBitmap(adaqrcode_width, adaqrcode_height, adaqrcode_data);
-//   printer.feed(5);
-  
-  printer.justify('L'); // left justify
+  // printer.justify('L'); // left justify
   printer.setDefault(); // Restore printer to defaults
-  
   printer.sleep();      // Tell printer to sleep
-//   printer.wake();       // MUST call wake() before printing again, even if reset
-  
 }
 
 void loop()
