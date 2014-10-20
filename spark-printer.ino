@@ -22,6 +22,8 @@
 int printer_RX_Pin = 0;  // Serial1 Rx pin on Spark to the green wire on printer
 int printer_TX_Pin = 0;  // Serial1 Tx pin on Spark to the yellow wire on printer
 
+int led = D7; // sets pin
+
 unsigned long lastTime = 0UL;
 
 Adafruit_Thermal printer(printer_RX_Pin, printer_TX_Pin);
@@ -144,6 +146,9 @@ int printCentreMedium(String args){
 
 void setup(){
     
+  // initialize pin D7 as an output for use as a blinky LED
+  pinMode(led, OUTPUT);
+    
   // open serial over USB for debugging
   Serial.begin(9600);
   
@@ -222,11 +227,18 @@ void loop()
         
         // prints the card ID to the printer for testing purposes
         Spark.publish("scannedCardID",scannedCardID);
-        printer.wake();
-        printer.println("Card detected:");
-        printer.println(scannedCardID);
-        printer.feed(2);
-        printer.sleep();
+        digitalWrite(led, HIGH);
+        delay(150);
+        digitalWrite(led, LOW);
+        delay(50);
+        digitalWrite(led, HIGH);
+        delay(150);
+        digitalWrite(led, LOW);
+        // printer.wake();
+        // printer.println("Card detected:");
+        // printer.println(scannedCardID);
+        // printer.feed(2);
+        // printer.sleep();
       }
       else
       {
