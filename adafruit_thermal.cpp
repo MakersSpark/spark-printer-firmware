@@ -9,14 +9,19 @@
 
   Written by Limor Fried/Ladyada for Adafruit Industries.
   MIT license, all text above must be included in any redistribution.
-  
-  This file was modified by Przemysław Grzywacz <nexather@gmail.com>
-  in order to run on Spark Core.
  *************************************************************************/
-
-
-#include "application.h"
 #include "Adafruit_Thermal.h"
+
+#if defined (SPARK)
+//nothing to do
+#else
+#if ARDUINO >= 100
+ #include "Arduino.h"
+#else
+ #include "WProgram.h"
+ #include "WConstants.h"
+#endif
+#endif  //Spark
 
 
 // Though most of these printers are factory configured for 19200 baud
@@ -68,8 +73,10 @@ void Adafruit_Thermal::setTimes(unsigned long p, unsigned long f) {
 }
 
 // Constructor
-Adafruit_Thermal::Adafruit_Thermal() {
-
+Adafruit_Thermal::Adafruit_Thermal(int RX_Pin, int TX_Pin) {
+  //For Spark, RX/TX pins not used since using Serial1
+  _RX_Pin = RX_Pin;
+  _TX_Pin = TX_Pin;
 }
 
 // The next four helper methods are used when issuing configuration
@@ -107,7 +114,11 @@ void Adafruit_Thermal::writeBytes(uint8_t a, uint8_t b, uint8_t c, uint8_t d) {
 
 // The underlying method for all high-level printing (e.g. println()).
 // The inherited Print class handles the rest!
+#if ((ARDUINO >= 100) || (SPARK == 1))
 size_t Adafruit_Thermal::write(uint8_t c) {
+#else
+void Adafruit_Thermal::write(uint8_t c) {
+#endif
 
   if(c != 0x13) { // Strip carriage returns
     timeoutWait();
@@ -126,11 +137,19 @@ size_t Adafruit_Thermal::write(uint8_t c) {
     prevByte = c;
   }
 
+#if ((ARDUINO >= 100) || (SPARK == 1))
   return 1;
+#endif
 }
 
-void Adafruit_Thermal::begin(SERIAL_IMPL* serial, int heatTime) {
-  _printer = serial;
+void Adafruit_Thermal::begin(int heatTime) {
+#if defined (SPARK)
+  _printer = &Serial1;        //For Spark, use Serial1 Tx, Rx pins
+  _printer->begin(BAUDRATE);
+#else
+  _printer = new SERIAL_IMPL(_RX_Pin, _TX_Pin);
+  _printer->begin(BAUDRATE);
+#endif
 
   // The printer can't start receiving data immediately upon power up --
   // it needs a moment to cold boot and initialize.  Allow at least 1/2
@@ -174,9 +193,10 @@ void Adafruit_Thermal::begin(SERIAL_IMPL* serial, int heatTime) {
   writeBytes(18, 35); // DC2 # (print density)
   writeBytes((printBreakTime << 5) | printDensity);
 
-  dotPrintTime = 30000; // See comments near top of file for
-  dotFeedTime  =  2100; // an explanation of these values.
-  maxChunkHeight = 255;
+//   dotPrintTime = 30000; // See comments near top of file for
+  dotPrintTime = 17000; // See comments near top of file for
+//   dotFeedTime  =  2100; // an explanation of these values.
+  dotFeedTime  =  1400; // an explanation of these values.
 }
 
 // Reset printer to default state.
@@ -381,7 +401,6 @@ void Adafruit_Thermal::underlineOff() {
   underlineOn(0);
 }
 
-// fromProgMem is ignored
 void Adafruit_Thermal::printBitmap(
  int w, int h, const uint8_t *bitmap, bool fromProgMem) {
   int rowBytes, rowBytesClipped, rowStart, chunkHeight, x, y, i;
@@ -389,16 +408,16 @@ void Adafruit_Thermal::printBitmap(
   rowBytes        = (w + 7) / 8; // Round up to next byte boundary
   rowBytesClipped = (rowBytes >= 48) ? 48 : rowBytes; // 384 pixels max width
 
-  for(i=rowStart=0; rowStart < h; rowStart += maxChunkHeight) {
+  for(i=rowStart=0; rowStart < h; rowStart += 255) {
     // Issue up to 255 rows at a time:
     chunkHeight = h - rowStart;
-    if(chunkHeight > maxChunkHeight) chunkHeight = maxChunkHeight;
+    if(chunkHeight > 255) chunkHeight = 255;
 
     writeBytes(18, 42, chunkHeight, rowBytesClipped);
 
     for(y=0; y < chunkHeight; y++) {
       for(x=0; x < rowBytesClipped; x++, i++) {
-        PRINTER_PRINT(*(bitmap+i));
+        PRINTER_PRINT(fromProgMem ? pgm_read_byte(bitmap + i) : *(bitmap+i));
       }
       i += rowBytes - rowBytesClipped;
     }
@@ -413,10 +432,10 @@ void Adafruit_Thermal::printBitmap(int w, int h, Stream *stream) {
   rowBytes        = (w + 7) / 8; // Round up to next byte boundary
   rowBytesClipped = (rowBytes >= 48) ? 48 : rowBytes; // 384 pixels max width
 
-  for(rowStart=0; rowStart < h; rowStart += maxChunkHeight) {
+  for(rowStart=0; rowStart < h; rowStart += 255) {
     // Issue up to 255 rows at a time:
     chunkHeight = h - rowStart;
-    if(chunkHeight > maxChunkHeight) chunkHeight = maxChunkHeight;
+    if(chunkHeight > 255) chunkHeight = 255;
 
     writeBytes(18, 42, chunkHeight, rowBytesClipped);
 
@@ -489,7 +508,9 @@ void Adafruit_Thermal::wake() {
 // Tell the soft serial to listen. Needed if you are using multiple
 // SoftSerial interfaces.
 void Adafruit_Thermal::listen() {
-  //_printer->listen();
+#if !defined(SPARK)
+  _printer->listen();
+#endif
 }
 
 // Check the status of the paper using the printers self reporting
@@ -532,10 +553,6 @@ void Adafruit_Thermal::setLineHeight(int val) {
   writeBytes(27, 51, val);
 }
 
-void Adafruit_Thermal::setMaxChunkHeight(int val) {
-  maxChunkHeight = val;
-}
-
 ////////////////////// not working?
 void Adafruit_Thermal::tab() {
   PRINTER_PRINT(9);
@@ -545,7 +562,9 @@ void Adafruit_Thermal::setCharSpacing(int spacing) {
 }
 /////////////////////////
 
-// #if ARDUINO < 100
-// void *operator new(size_t size_) { return malloc(size_); }
-// void* operator new(size_t size_,void *ptr_) { return ptr_; }
-// #endif
+#if !defined (SPARK)
+#if ARDUINO < 100
+void *operator new(size_t size_) { return malloc(size_); }
+void* operator new(size_t size_,void *ptr_) { return ptr_; }
+#endif
+#endif
