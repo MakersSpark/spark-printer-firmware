@@ -57,6 +57,10 @@ int print(String args){
     printCentreBig(bodyText);
     return 1;
   }
+  else if(command == "CENTREMED") {
+    printCentreMedium(bodyText);
+    return 1;
+  }
   else if(command == "HELLO") {
     printALine(bodyText);
     printer.wake();
@@ -118,6 +122,19 @@ int printCentreBig(String args){
   printer.sleep();
   return 1;
 }
+
+int printCentreMedium(String args){
+  printer.wake();
+  printer.setSize('M');
+  printer.justify('C');
+  printer.println(args);
+  printer.setSize('S');
+  printer.justify('L');
+  printer.sleep();
+  return 1;
+}
+
+
 
 //
 //
@@ -219,4 +236,5 @@ void loop()
       }   
     }
 }
+
 
