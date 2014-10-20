@@ -130,6 +130,15 @@ int printCentreBig(String args){
 }
 
 
+
+
+
+//
+//
+// program main body
+//
+//
+
 void setup(){
     
   //
@@ -154,7 +163,7 @@ void setup(){
 //   Spark.function("printImage", printImage);
 
 //   printer.println("Team Spark rulez!");
-  printer.feed(1);  
+  printer.feed(3);  
   printer.justify('C'); // centre justify
   printer.println("Welcome to Spark Printer.");
 //   printer.feed(2);
@@ -244,3 +253,4 @@ void loop()
       }   
     }
 }
+
