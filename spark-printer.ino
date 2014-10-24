@@ -41,26 +41,32 @@ int print(String args){
   
   if(command == "BOLD") {
     printBold(bodyText);
+    Spark.publish("printerReady");
     return 1;
   }
   else if(command == "TEXT") {
     printALine(bodyText);
+    Spark.publish("printerReady");
     return 1;
   }
   else if(command == "BIG") {
     printBig(bodyText);
+    Spark.publish("printerReady");
     return 1;
   }
   else if(command == "CENTRE") {
     printCentre(bodyText);
+    Spark.publish("printerReady");
     return 1;
   }
    else if(command == "CENTREBIG") {
     printCentreBig(bodyText);
+    Spark.publish("printerReady");
     return 1;
   }
   else if(command == "CENTREMED") {
     printCentreMedium(bodyText);
+    Spark.publish("printerReady");
     return 1;
   }
   else if(command == "HELLO") {
@@ -68,11 +74,17 @@ int print(String args){
     printer.wake();
     printer.feed(2);
     printer.sleep();
+    Spark.publish("printerReady");
     return 1;
   }
   else {
     return -1;
   }
+}
+
+int isPrinterReady(String args){
+    Spark.publish("printerReady");
+    Serial.println("'printerReady' called through API.");
 }
 
 
@@ -166,6 +178,7 @@ void setup(){
   printer.begin();
   
   Spark.function("print", print);
+  Spark.function("isPrinterReady", isPrinterReady);
 
   printer.feed(3);  
   printer.justify('C'); // centre justify
@@ -176,6 +189,7 @@ void setup(){
   // printer.justify('L'); // left justify
   printer.setDefault(); // Restore printer to defaults
   printer.sleep();      // Tell printer to sleep
+  Spark.publish("printerReady");
 }
 
 void loop()
